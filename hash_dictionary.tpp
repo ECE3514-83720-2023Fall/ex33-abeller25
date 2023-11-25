@@ -116,25 +116,120 @@ void HashDictionary<KeyType, ValueType, HashType>::add(const KeyType &key,
     // TODO implement the add method...
     
     // 1. hash the key
-    
+    std::size_t index = m_hash(key) % m_capacity;
+    std::size_t probes = 0;
     
     // 2. do linear probing
-    
-    // 3. Check to see if linear probing has failed
-    
-    // 4. insert the key-value pair
-   
-    // 5. test if we need to reallocate¡¡and reallocate if needed
-    
-      
+    while (m_data[index].filled) 
+    {
+        if (m_data[index].key == key) 
+        {
+            // key already exists, update value
+            m_data[index].value = value;
+            return;
+        }
+        index = (index + 1) % m_capacity;
+        probes++;
 
+        // 3. Check to see if linear probing has failed
+        if (m_capacity == probes)
+        {
+          throw std::runtime_error("Cannot add. Dictionary is full.");
+        }
+    }
+
+
+    // 4. insert the key-value pair
+   m_data[index].filled = true;
+   m_data[index].key = key;
+   m_data[index].value = value; 
+
+    // 5. test if we need to reallocate¡¡and reallocate if needed
+    m_size++;
+      
+    // if reallocation needed
+    if(static_cast<float>(m_size) / static_cast<float>(m_capacity) > m_load_factor)
+    {
+        // double capacity
+        std::size_t newCap = 2 * m_capacity; 
+
+        // create new array with new capacity
+        KeyValueType *newData = new KeyValueType[newCap](); 
+
+        // rehash/reinsert existing elements
+        for(std::size_t i = 0; i < m_capacity; i++)
+        {
+            if(m_data[i].filled)
+            {
+                std::size_t newIndex = m_hash(m_data[i].key) % newCap;
+
+                // linear probing in new array
+                while (newData[newIndex].filled)
+                {
+                    newIndex = (newIndex + 1) % newCap;
+                }
+
+                newData[newIndex].filled = true;
+                newData[newIndex].key = m_data[i].key;
+                newData[newIndex].value = m_data[i].value;
+            }
+        }
+
+        delete[] m_data;
+
+        // updates capacity and pointer to array
+        m_capacity = newCap;
+        m_data = newData;
+    }
 }
 
 template <typename KeyType, typename ValueType, typename HashType>
 void HashDictionary<KeyType, ValueType, HashType>::remove(const KeyType &key) {
     
     //TODO implement the remove method...
+
+    std::size_t index = m_hash(key) % m_capacity;
+    std::size_t orgIndex = index;
+    
+    while (m_data[index].filled) 
+    {
+        if (m_data[index].key == key) 
+        {
+            // found key, mark slot as empty
+            m_data[index].filled = false;
+            m_size--;
+
+            // check for elements that might need to be rehashed 
+            std::size_t nextIndex = (index + 1) % m_capacity;
+            while(m_data[nextIndex].filled)
+            {
+                std::size_t newIndex = m_hash(m_data[nextIndex].key % m_capacity);
+
+                // linear probing in new position
+                while(m_data[newIndex].filled)
+                {
+                    newIndex = (newIndex + 1) % m_capacity;
+                }
+
+                m_data[newIndex] = m_data[nextIndex];
+                m_data[nextIndex].filled = false;
+
+                nextIndex = (nextIndex + 1) % m_capacity; 
+
+            }
+            return;
+        }
+        // linear probing
+        index = (index + 1) % m_capacity;\
+
+         if(index == orgIndex)
+         {
+             throw std::runtime_error("Cannot remove. Key not found.");
+         }
+    }
+
 }
+
 
 template <typename KeyType, typename ValueType, typename HashType>
 void HashDictionary<KeyType, ValueType, HashType>::clear() {
