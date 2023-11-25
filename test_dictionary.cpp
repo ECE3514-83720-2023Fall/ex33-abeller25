@@ -49,6 +49,10 @@ TEST_CASE("Basic Tests", "[Dictionary]") {
 	REQUIRE(test_dictionary.size() == 2);
 	REQUIRE_FALSE(test_dictionary.contains(2));
 
+	// ensures throw error occurs when remove index is out of bounds
+	REQUIRE_THROWS(test_dictionary.remove(10));
+	REQUIRE_THROWS(test_dictionary.remove(100));
+
 	// test clearing capabilities 
 	test_dictionary.clear();
 	REQUIRE(test_dictionary.isEmpty());
@@ -78,7 +82,9 @@ TEST_CASE("Test large Dictionary", "[Dictionary]") {
 		REQUIRE(test_dictionary.get(i) == expected);
 	}
 
-	// ensure clear() gets rid of all entries
+	// ensures throw error occurs when remove index is out of bounds
+	REQUIRE_THROWS(test_dictionary.remove(3000));
+
 	test_dictionary.clear();
 	REQUIRE(test_dictionary.size() == 0);
 }

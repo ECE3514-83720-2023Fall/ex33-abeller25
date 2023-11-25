@@ -189,7 +189,7 @@ void HashDictionary<KeyType, ValueType, HashType>::remove(const KeyType &key) {
     //TODO implement the remove method...
 
     std::size_t index = m_hash(key) % m_capacity;
-    std::size_t orgIndex = index;
+    std::size_t probes = 0;
     
     while (m_data[index].filled) 
     {
@@ -215,19 +215,22 @@ void HashDictionary<KeyType, ValueType, HashType>::remove(const KeyType &key) {
                 m_data[nextIndex].filled = false;
 
                 nextIndex = (nextIndex + 1) % m_capacity; 
-
             }
+
             return;
         }
-        // linear probing
-        index = (index + 1) % m_capacity;\
 
-         if(index == orgIndex)
-         {
-             throw std::runtime_error("Cannot remove. Key not found.");
-         }
+        // linear probing
+        index = (index + 1) % m_capacity;
+        probes++;
+
+         if (m_capacity == probes)
+        {
+          throw std::logic_error("Cannot remove. Key does not exist.");
+        }
     }
 
+    throw std::logic_error("Cannot remove. Key does not exist.");
 }
 
 
