@@ -85,6 +85,7 @@ TEST_CASE("Test large Dictionary", "[Dictionary]") {
 	// ensures throw error occurs when remove index is out of bounds
 	REQUIRE_THROWS(test_dictionary.remove(3000));
 
+	// tests clear 
 	test_dictionary.clear();
 	REQUIRE(test_dictionary.size() == 0);
 }
