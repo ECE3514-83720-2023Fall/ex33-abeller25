@@ -25,7 +25,7 @@ TEST_CASE("Basic Tests", "[Dictionary]") {
 	//To DO
 	DictionaryType test_dictionary(testHash);
 
-	// require dictionary initially empty and no size
+	// require dictionary, initially empty and no size
 	REQUIRE(test_dictionary.isEmpty());
 	REQUIRE(test_dictionary.size() == 0);
 
